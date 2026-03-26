@@ -178,7 +178,6 @@ def novo_suporte(id):
     equip = Equipamento.query.get_or_404(id)
     return render_template("novo_suporte.html", equip=equip)
 
-# AJUSTE NA ROTA SALVAR: Agora ela finaliza um chamado existente
 @app.route("/equipamento/salvar-suporte/<int:id>", methods=["POST"])
 def salvar_suporte(id):
     equip = Equipamento.query.get_or_404(id)
