@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Axis IT Management</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+   <nav class="navbar">
+        <div class="navbar-fluid">
+            
+            <a class="logo" href="{{ url_for('dashboard') }}">
+                Axis Gestão de TI
+            </a>
+
+            <div class="menu">
+            {% if session.get('usuario_logado') %}
+                <a href="{{ url_for('dashboard') }}"><i class="fas fa-home"></i> Início</a>
+
+                <div class="dropdown">
+                    <a href="#" class="dropbtn">Equipamentos <i class="fas fa-caret-down"></i></a>
+                    <div class="dropdown-content">
+                        <a href="{{ url_for('list_equipamentos') }}"><i class="fas fa-boxes"></i> Inventário</a>
+                        <a href="{{ url_for('cad_equipamento') }}"><i class="fas fa-plus"></i> Novo Equipamento</a>
+                        <a href="{{ url_for('lista_chamados') }}"><i class="fas fa-tools"></i> Fila de Chamados</a>
+                    </div>
+                </div>
+            {% endif %}
+
+            <a href="{{ url_for('sobre') }}">Sobre</a>
+            <a href="{{ url_for('contato') }}">Suporte</a>
+            
+            {% if session.get('usuario_logado') %}
+                <a href="{{ url_for('logout') }}" class="btn-logout" onclick="return confirmarSaida()">
+                    <i class="fas fa-sign-out-alt"></i> Sair
+                </a>
+            {% endif %}
+            </div>
+        </div>
+    </nav>
+    <div class="content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div id="flash-message" style="padding: 15px; margin-bottom: 20px; border-radius: 8px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: relative;">
+                  <i class="fas fa-check-circle"></i> {{ message }}
+                  <button onclick="this.parentElement.style.display='none'" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; border: none; background: transparent; font-weight: bold; color: #155724;">&times;</button>
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    
+    <script>
+        setTimeout(function() {
+            var flash = document.getElementById('flash-message');
+            if (flash) {
+                flash.style.transition = "opacity 0.5s ease";
+                flash.style.opacity = "0";
+                setTimeout(function() { flash.remove(); }, 500);
+            }
+        }, 4000);
+
+        function confirmarSaida() {
+            return confirm("Deseja realmente sair do sistema?");
+        }
+    </script>
+</body>
+</html>
+

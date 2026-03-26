@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="auth-card">
+    <h2 style="text-align: center; margin-bottom: 25px;">Acessar Conta</h2>
+    
+    <form method="POST" action="{{ url_for('login') }}">
+        <input type="text" name="nome" class="content_input" placeholder="Usuário" required>
+        <input type="password" name="senha" class="content_input" placeholder="Senha" required>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 0.85rem;">
+            <label class="remember-me">
+                <input type="checkbox" name="remember"> Lembre-me
+            </label>
+            <a href="#" style="color: var(--primary); text-decoration: none;">Esqueceu a senha?</a>
+        </div>
+
+        <button type="submit" class="btn-primary">Entrar</button>
+    </form>
+
+    <p style="text-align: center; margin-top: 20px; font-size: 0.9rem; color: #666;">
+        Ainda não tem usuário? <a href="{{ url_for('contato') }}" style="color: var(--primary); font-weight: bold; text-decoration: none;">Clique aqui</a>
+    </p>
+
+    {% if error %}
+        <p style="color: red; text-align: center; margin-top: 15px;">{{ error }}</p>
+    {% endif %}
+</div>
+{% endblock %}

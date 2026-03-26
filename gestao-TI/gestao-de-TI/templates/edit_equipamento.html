@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="content_login" style="max-width: 600px; margin: 50px auto;">
+    <h2 class="login-title">Editar Equipamento</h2>
+    
+    <form id="formEdicao" action="{{ url_for('edit_equipamento', id=equip.id) }}" method="POST" class="content_login_interno">
+        <label>Patrimônio:</label>
+        <input type="text" name="patrimonio" value="{{ equip.patrimonio }}" class="content_input" required>
+        
+        <label>Tipo:</label>
+        <select name="tipo" class="content_input" required>
+            <option value="Notebook" {% if equip.tipo == 'Notebook' %}selected{% endif %}>Notebook</option>
+            <option value="Desktop" {% if equip.tipo == 'Desktop' %}selected{% endif %}>Desktop</option>
+            <option value="Monitor" {% if equip.tipo == 'Monitor' %}selected{% endif %}>Monitor</option>
+            <option value="Impressora" {% if equip.tipo == 'Impressora' %}selected{% endif %}>Impressora</option>
+        </select>
+
+        <label>Marca/Modelo:</label>
+        <input type="text" name="marca" value="{{ equip.marca }}" class="content_input" required>
+
+        <label>Status:</label>
+        <select name="status" class="content_input">
+            <option value="Em Uso" {% if equip.status == 'Em Uso' %}selected{% endif %}>Em Uso</option>
+            <option value="Em Manutenção" {% if equip.status == 'Em Manutenção' %}selected{% endif %}>Em Manutenção</option>
+            <option value="Disponível" {% if equip.status == 'Disponível' %}selected{% endif %}>Disponível (Estoque)</option>
+            <option value="Desativado" {% if equip.status == 'Desativado' %}selected{% endif %}>Desativado</option>
+        </select>
+        <div class="form-footer-actions">
+        <button type="submit" class="btn-primary" style="margin-bottom: 15px;">Salvar Alterações</button>
+
+        <div style="display: flex; gap: 20px; align-items: center;">
+            <a href="{{ url_for('detalhe_equipamento', id=equip.id) }}" class="btn-secondary">
+                Cancelar
+            </a>
+            
+            <a href="{{ url_for('delete_equipamento', id=equip.id) }}" class="btn-danger-link" onclick="return confirm('Deseja excluir permanentemente?')">
+                Excluir <i class="fas fa-trash-alt"></i>
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

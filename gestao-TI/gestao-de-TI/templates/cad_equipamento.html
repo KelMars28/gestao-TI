@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="content_login" style="max-width: 600px; margin: 50px auto;">
+    <h2 class="login-title">Cadastro de Equipamento</h2>
+    <form action="{{ url_for('cad_equipamento') }}" method="POST" class="content_login_interno">
+        <input type="text" name="patrimonio" placeholder="Patrimônio (ex: 00123)" class="content_input" required>
+        
+        <select name="tipo" class="content_input" required>
+            <option value="" disabled selected>Selecione o Tipo</option>
+            <option value="Notebook">Notebook</option>
+            <option value="Desktop">Desktop</option>
+            <option value="Monitor">Monitor</option>
+            <option value="Impressora">Impressora</option>
+        </select>
+
+        <input type="text" name="marca" placeholder="Marca/Modelo" class="content_input" required>
+        <input type="text" name="serie" placeholder="Número de Série" class="content_input">
+        
+        <div style="display: flex; gap: 20px; margin-bottom: 15px;">
+        <div style="flex: 1;">
+                <label style="display: block; margin-bottom: 5px;">Data de Aquisição:</label>
+                <input type="date" name="data_aquisicao" class="form-control" style="width: 100%;">
+            </div>
+
+            <div style="flex: 1;">
+                <label style="display: block; margin-bottom: 5px;">Valor de Compra (R$):</label>
+                <input type="number" step="0.01" name="valor_compra" placeholder="0.00" class="form-control" style="width: 100%;">
+            </div>
+        </div>
+
+        <select name="status" class="content_input">
+            <option value="Em Uso">Em Uso</option>
+            <option value="Em Manutenção">Em Manutenção</option>
+            <option value="Disponível">Disponível (Estoque)</option>
+            <option value="Desativado">Desativado</option>
+        </select>
+
+        <button type="submit" class="btn-primary">Salvar Equipamento</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container">
+    <h2><i class="fas fa-tools"></i> Fila de Chamados Ativos</h2>
+    <p>Abaixo estão os equipamentos aguardando manutenção.</p>
+
+    <div class="chart-card">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: #f8f9fa; border-bottom: 2px solid #eee;">
+                    <th style="padding: 12px; text-align: left;">Data</th>
+                    <th style="padding: 12px; text-align: left;">Equipamento</th>
+                    <th style="padding: 12px; text-align: left;">Problema Relatado</th>
+                    <th style="padding: 12px; text-align: center;">Ação</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cham in chamados %}
+                <tr style="border-bottom: 1px solid #eee;">
+                    <td style="padding: 12px;">{{ cham.data_abertura.strftime('%d/%m/%Y %H:%M') }}</td>
+                    <td style="padding: 12px;">
+                        <strong>{{ cham.equip.marca }} {{ cham.equip.modelo }}</strong><br>
+                        <small>Patrimônio: {{ cham.equip.patrimonio }}</small>
+                    </td>
+                    <td style="padding: 12px;">{{ cham.problema }}</td>
+                    <td style="padding: 12px; text-align: center;">
+                        <a href="{{ url_for('tela_resolver_chamado', id_chamado=cham.id) }}" class="btn-action-save" style="text-decoration: none; padding: 8px 15px; border-radius: 5px; display: inline-block;">
+                            <i class="fas fa-wrench"></i> Resolver
+                        </a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" style="padding: 60px; text-align: center; color: #777;">
+                        <div style="font-size: 3rem; color: #28a745; margin-bottom: 15px;">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h3 style="margin-bottom: 10px;">Tudo em ordem por aqui!</h3>
+                        <p>Não há chamados pendentes na fila de manutenção.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

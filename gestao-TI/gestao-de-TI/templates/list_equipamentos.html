@@ -1,0 +1,92 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2><i class="fas fa-boxes"></i> Inventário de Ativos</h2>
+        <a href="{{ url_for('cad_equipamento') }}" class="btn-base btn-save" style="text-decoration: none;">+ Novo</a>
+    </div>
+
+    <div class="chart-card" style="margin-bottom: 20px;">
+        <form action="{{ url_for('list_equipamentos') }}" method="GET" 
+        style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 10px; align-items: center;">
+        
+        <div>
+            <input type="text" name="search" value="{{ search }}" placeholder="Patrimônio ou Marca..." class="content_input" list="marcas_sugestoes" style="margin-bottom: 0;">
+            <datalist id="marcas_sugestoes">
+                {% for sug in sugestoes %}
+                    <option value="{{ sug }}">
+                {% endfor %}
+            </datalist>
+        </div>
+
+        <select name="tipo" class="content_input" style="margin-bottom: 0;">
+            <option value="">Todos os Tipos</option>
+            {% for t in ["Notebook", "Desktop", "Monitor", "Impressora"] %}
+                <option value="{{ t }}" {{ 'selected' if tipo_selecionado == t }}>{{ t }}</option>
+            {% endfor %}
+        </select>
+
+        <select name="status" class="content_input" style="margin-bottom: 0;">
+            <option value="">Todos os Status</option>
+            {% for s in ["Disponível", "Em Uso", "Em Manutenção"] %}
+                <option value="{{ s }}" {{ 'selected' if status_selecionado == s }}>{{ s }}</option>
+            {% endfor %}
+        </select>
+
+        <div style="display: flex; gap: 5px;">
+            <button type="submit" class="btn-action btn-action-save" title="Filtrar">
+                <i class="fas fa-filter"></i>
+            </button>
+            <a href="{{ url_for('list_equipamentos') }}" class="btn-action btn-action-cancel" title="Limpar" style="text-decoration: none;">
+                <i class="fas fa-eraser"></i>
+            </a>
+        </div>
+        </form>
+    </div>
+
+    <div class="chart-card">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="text-align: left; border-bottom: 2px solid #eee;">
+                    <th style="padding: 12px;">ID</th>
+                    <th style="padding: 12px;">Patrimônio</th>
+                    <th style="padding: 12px;">Tipo</th>
+                    <th style="padding: 12px;">Marca/Modelo</th>
+                    <th style="padding: 12px;">Status</th>
+                    <th style="padding: 12px;">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for e in equipamentos %}
+                <tr style="border-bottom: 1px solid #eee;">
+                    <td style="padding: 12px;">{{ e.id }}</td>
+                    <td style="padding: 12px;"><strong>{{ e.patrimonio }}</strong></td>
+                    <td style="padding: 12px;">{{ e.tipo }}</td>
+                    <td style="padding: 12px;">{{ e.marca }} {{ e.modelo }}</td>
+                    <td style="padding: 12px;">
+                        <span class="status-badge {{ 'status-uso' if e.status == 'Em Uso' else ('status-manutencao' if e.status == 'Em Manutenção' else 'status-disponivel') }}">
+                            {{ e.status }}
+                        </span>
+                    </td>
+                    <td style="padding: 12px;">
+                        <a href="{{ url_for('detalhe_equipamento', id=e.id) }}" style="color: #4a90e2; text-decoration: none; margin-right: 15px;" title="Ver Detalhes">
+                            <i class="fas fa-eye"></i> Ver
+                        </a>
+                        <a href="{{ url_for('delete_equipamento', id=e.id) }}" style="color: #e74c3c; text-decoration: none;" onclick="return confirm('Tem certeza que deseja excluir?')" title="Excluir">
+                            <i class="fas fa-trash"></i> Excluir
+                        </a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" style="padding: 40px; text-align: center; color: #999;">
+                        <i class="fas fa-search" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
+                        Nenhum equipamento cadastrado ou encontrado.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,118 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2><i class="fas fa-laptop"></i> Detalhes do Equipamento</h2>
+        <div>
+            <a href="{{ url_for('edit_equipamento', id=equip.id) }}" class="btn-base btn-save" style="text-decoration: none;">
+                <i class="fas fa-edit"></i> Editar Dados
+            </a>
+            <a href="{{ url_for('list_equipamentos') }}" class="btn-base btn-cancel" style="text-decoration: none; margin-left: 10px;">
+                <i class="fas fa-arrow-left"></i> Voltar
+            </a>
+        </div>
+    </div>
+
+    <div class="info-grid">
+        <div class="info-item">
+            <h4>Patrimônio</h4>
+            <p>{{ equip.patrimonio }}</p>
+        </div>
+        <div class="info-item">
+            <h4>Tipo</h4>
+            <p>{{ equip.tipo }}</p>
+        </div>
+        <div class="info-item">
+            <h4>Marca/Modelo</h4>
+            <p>{{ equip.marca }}</p>
+        </div>
+        <div class="info-item">
+            <small>Valor Investido:</small>
+            <p>R$ {{ "%.2f"|format(equip.valor_compra) }}</p>
+        </div>
+    </div>
+        <div style="margin: 25px 0;">
+                {% if equip.status != 'Em Manutenção' %}
+                    <button onclick="document.getElementById('modalChamado').style.display='block'" 
+                            class="btn-primary" 
+                            style="width: auto; display: inline-flex; align-items: center; gap: 10px; background-color: var(--success) !important;">
+                        <i class="fas fa-plus"></i> Abrir Chamado de Manutenção
+                    </button>
+                {% else %}
+                    <div style="padding: 15px; background-color: #fff3cd; color: #856404; border-radius: 8px; border: 1px solid #ffeeba;">
+                        <i class="fas fa-info-circle"></i> <strong>Equipamento em Manutenção:</strong> O chamado está na fila técnica.
+                    </div>
+                {% endif %}
+            </div>
+
+    <div id="modalChamado" style="display:none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(3px);">
+        <div style="background-color: #fff; margin: 10% auto; padding: 30px; border-radius: 12px; width: 500px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); position: relative; animation: fadeIn 0.3s;">
+            
+            <span onclick="document.getElementById('modalChamado').style.display='none'" style="position: absolute; right: 20px; top: 15px; font-size: 28px; cursor: pointer; color: #aaa;">&times;</span>
+            
+            <h3 style="margin-bottom: 10px; color: #333;"><i class="fas fa-tools" style="color: #28a745;"></i> Nova Manutenção</h3>
+            <p style="color: #666; margin-bottom: 20px;">Descreva o problema do patrimônio <strong>{{ equip.patrimonio }}</strong>:</p>
+
+            <form action="{{ url_for('abrir_chamado', id=equip.id) }}" method="POST">
+                <textarea name="problema" placeholder="Ex: Teclado falhando ou sistema lento..." 
+                          style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; min-height: 120px; font-family: inherit; resize: vertical;" required></textarea>
+                
+                <div style="margin-top: 25px; text-align: right;">
+                    <button type="button" onclick="document.getElementById('modalChamado').style.display='none'" class="btn-base btn-cancel" style="background: #eee; color: #333; border: none; margin-right: 10px;">Cancelar</button>
+                    <button type="submit" class="btn-base btn-save" style="background-color: #28a745; border: none;">
+                        <i class="fas fa-paper-plane"></i> Confirmar Chamado
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="chart-card" style="margin-top: 20px;">
+        <h3><i class="fas fa-history"></i> Histórico de Manutenções</h3>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+            <thead style="background: #f8f9fa;">
+                <tr>
+                    <th style="padding: 12px; text-align: left;">Data</th>
+                    <th style="padding: 12px; text-align: left;">Técnico</th>
+                    <th style="padding: 12px; text-align: left;">Problema / Solução</th>
+                    <th style="padding: 12px; text-align: left;">Custo</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sup in suportes %}
+                <tr style="border-bottom: 1px solid #eee;">
+                    <td style="padding: 12px;">{{ sup.data_abertura.strftime('%d/%m/%Y') if sup.data_abertura else '--' }}</td>
+                    <td style="padding: 12px;">
+                        {% if sup.status == 'Pendente' %}
+                            <span style="color: #e67e22; font-weight: bold;"><i class="fas fa-clock"></i> PENDENTE</span>
+                        {% else %}
+                            {{ sup.tecnico }}
+                        {% endif %}
+                    </td>
+                    <td style="padding: 12px;">
+                        <strong>P:</strong> {{ sup.problema }}<br>
+                        {% if sup.status == 'Pendente' %}
+                            <small style="color: #666;">(Aguardando solução na fila de chamados)</small>
+                        {% else %}
+                            <strong>S:</strong> {{ sup.solucao }}
+                        {% endif %}
+                    </td>
+                    <td style="padding: 12px;">R$ {{ "%.2f"|format(sup.custo) if sup.custo else '0.00' }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" style="padding: 30px; text-align: center; color: #999;">Nenhum registro de manutenção encontrado.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+{% endblock %}
