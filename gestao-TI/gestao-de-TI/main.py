@@ -6,9 +6,9 @@ import os
 app = Flask(__name__)
 app.secret_key = 'chave_muito_segura_123'
 
-# Configuração do Banco de Dados (Garante que salve na pasta correta)
-basedir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'database.db')
+# --- CONFIGURAÇÃO PARA XAMPP (MYSQL) ---
+# Certifique-se de ter criado o banco 'gestao_ti' no phpMyAdmin antes de rodar
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/gestao_ti'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
@@ -30,9 +30,10 @@ class Suporte(db.Model):
     tecnico = db.Column(db.String(50))
     solucao = db.Column(db.Text)
     custo = db.Column(db.Float, default=0.0)
-    status = db.Column(db.String(20), default='Pendente') # Inicia como Pendente para ir para a Fila
+    status = db.Column(db.String(20), default='Pendente')
     equipamento_id = db.Column(db.Integer, db.ForeignKey('equipamento.id'), nullable=False)
 
+# CRIA AS TABELAS NO XAMPP AUTOMATICAMENTE
 with app.app_context():
     db.create_all()
 
@@ -133,6 +134,7 @@ def delete_equipamento(id):
     return redirect(url_for('list_equipamentos'))
 
 # --- ROTAS DE SUPORTE / CHAMADOS ---
+
 @app.route("/chamados")
 def lista_chamados():
     chamados = Suporte.query.filter_by(status='Pendente').order_by(Suporte.data_abertura.desc()).all()
@@ -149,14 +151,16 @@ def abrir_chamado(id):
     equip.status = "Em Manutenção"
     db.session.add(novo)
     db.session.commit()
-    flash("Chamado enviado com sucesso para a equipe técnica!", "success")
+    flash("Chamado enviado com sucesso!", "success")
     return redirect(url_for('detalhe_equipamento', id=id))
 
+# ROTA PARA ABRIR A TELA DE RESOLUÇÃO
 @app.route("/suporte/resolver/<int:id_chamado>")
 def tela_resolver_chamado(id_chamado):
     chamado = Suporte.query.get_or_404(id_chamado)
     return render_template("novo_suporte.html", chamado=chamado, equip=chamado.equip)
 
+# ROTA PARA SALVAR A RESOLUÇÃO E FINALIZAR
 @app.route("/suporte/finalizar/<int:id_chamado>", methods=["POST"])
 def finalizar_resolucao(id_chamado):
     chamado = Suporte.query.get_or_404(id_chamado)
@@ -170,31 +174,8 @@ def finalizar_resolucao(id_chamado):
     equip.status = "Disponível" 
     db.session.commit()
     
-    flash("Manutenção finalizada com sucesso!", "success")
+    flash("Manutenção finalizada!", "success")
     return redirect(url_for('detalhe_equipamento', id=equip.id))
-
-@app.route("/equipamento/novo-suporte/<int:id>")
-def novo_suporte(id):
-    equip = Equipamento.query.get_or_404(id)
-    return render_template("novo_suporte.html", equip=equip)
-
-@app.route("/equipamento/salvar-suporte/<int:id>", methods=["POST"])
-def salvar_suporte(id):
-    equip = Equipamento.query.get_or_404(id)
-    
-    # Busca o chamado que abrimos antes (o que está pendente)
-    chamado = Suporte.query.filter_by(equipamento_id=id, status="Pendente").first()
-    
-    if chamado:
-        chamado.tecnico = request.form.get("tecnico")
-        chamado.solucao = request.form.get("solucao")
-        chamado.custo = float(request.form.get("custo") or 0)
-        chamado.status = "Concluído"
-        
-        equip.status = "Disponível" # Ativo volta a ficar pronto para uso
-        db.session.commit()
-    
-    return redirect(url_for('detalhe_equipamento', id=id))
 
 # --- OUTRAS ROTAS ---
 
